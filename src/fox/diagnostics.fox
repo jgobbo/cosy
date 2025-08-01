@@ -1,0 +1,54 @@
+include 'COSY';
+
+Procedure Run;
+Variable n_spots 1; Variable n_angs 1;
+Variable i_spot 1; Variable i_ang 1;
+Variable ri 1700 6; Variable ro 1700 6; 
+
+Init;
+ReadFiles;
+
+intAng:=60*DEGRAD;
+spotSize:=100*um2mm;
+RedefineBeam;
+
+baseline:=0;
+
+V00:=300;
+V01:=0;
+V02:=0;
+
+V11:=0;
+V12:=0;
+V13:=0;
+
+V21:=0;
+V22:=0;
+V23:=0;
+
+V31:=0;
+V32:=0;
+V33:=0;
+
+VD0:=V23;
+VD1:=V23;
+VD2:=V23;
+
+SetVoltages voltages;
+GenerateMap voltages SampleZ 10;
+
+n_spots:=3;
+n_angs:=10;
+
+OpenF 11 'diagnostics.txt' 'UNKNOWN';
+Loop i_spot 0 n_spots-1;
+	Loop i_ang 0 n_angs-1;
+		ri(1):=i_spot/(n_spots-1)*spotSize/2;
+		ri(2):=SIN(i_ang/(n_angs-1)*intAng/2);
+		Polval 1 MAP 6 ri 6 ro 6;
+		Write 11 S(ro(1));
+	EndLoop;
+EndLoop;
+CloseF 11;
+ 
+EndProcedure; Run; End;

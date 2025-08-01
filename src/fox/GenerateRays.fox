@@ -1,0 +1,60 @@
+include 'COSY';
+
+Procedure Run;
+
+Init;
+ReadFiles;
+
+intAng:=5*DEGRAD;
+spotSize:=100*um2mm;
+RedefineBeam;
+
+baseline :=  -0.448146;
+
+V00 :=  464.59001;
+V01 :=  129.74737;
+V02 :=  464.59001;
+V03 :=  -37.60329;
+
+V10 :=  464.59001;
+V11 :=  480.01815;
+V12 :=  491.27970;
+V13 :=    1.05867;
+
+V21 :=    0.63404;
+V22 :=    0.00000;
+V23 :=    0.00000;
+
+V31 :=    0.00000;
+V32 :=    0.00376;
+V33 :=    0.00000;
+
+
+{
+baseline:=1;
+
+V00:=0;
+V01:=7.09;
+V02:=0;
+V03:=84;
+
+V10:=0;
+V11:=0;
+V12:=0;
+V13:=0;
+
+V21:=0;
+V22:=0;
+V23:=0;
+
+V31:=0;
+V32:=0;
+V33:=0;
+}
+
+SetVoltages voltages;
+{
+RayTracing sampleZ detZ;}
+SRConversionMap;
+ 
+EndProcedure; Run; End;

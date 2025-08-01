@@ -1,0 +1,15 @@
+include 'COSY';
+
+Procedure Run;
+Init;
+ReadFiles;
+
+VoltageOffset:=1;
+V11:=3.6;
+V12:=3.6;
+
+WeakLens 150 300;
+
+Write 6 focalLength;
+
+EndProcedure; Run; End;

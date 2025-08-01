@@ -1,0 +1,27 @@
+[project]
+name = "cosy"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "jgobbo", email = "gobbo.jacob@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "matplotlib>=3.10.3",
+    "numpy>=2.3.2",
+    "pathos>=0.3.4",
+    "pybads>=1.0.5",
+    "slappy",
+    "sympy>=1.14.0",
+]
+
+[project.scripts]
+cosy = "cosy:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv.sources]
+slappy = { path = "../slappy" }

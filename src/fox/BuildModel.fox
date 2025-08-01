@@ -1,0 +1,389 @@
+Include 'Cosy';
+
+Procedure Run;
+Variable mmToM 1;
+Variable rMax 1; Variable zMax 1;
+Variable nPieceR 1; Variable nPieceE 1; 
+Variable nTotal 1;
+Variable i 1; Variable j 1;
+Variable temp 5;
+
+Procedure elliptic k integral ;
+	Variable i 1; Variable delta 1; Variable n 1; Variable aux 100; Variable diff 1;
+	delta := 1e-25 ;
+	n := 1 ;
+	integral := 0 ;
+	aux := 1 ;
+	diff := 1 ;
+	While abs(diff)>delta ;
+		integral := integral + aux ;
+		diff := cons(pi*aux/2) ;
+		aux := aux*sqr(k*(2*n-1)/2/n) ;
+		n := n + 1 ;
+	EndWhile ;
+	integral := integral*pi/2 ;
+EndProcedure ;
+
+Procedure ellipticp k integral ;
+	Variable i 1 ; Variable delta 1 ; Variable n 1 ;
+	Variable diff 1 ; Variable aux 100 ; Variable aux1 100 ;
+	Variable kp 100 ;
+	kp := sqrt(1-sqr(k)) ;
+	delta := 1e-25 ;
+	n := 1 ;
+	integral := 0 ;
+	aux := 1 ;
+	aux1 := 0 ;
+	diff := 1 ;
+	While abs(diff)>delta ;
+		integral := integral + aux*(log(4/kp)-aux1) ;
+		diff := cons(aux*(log(4/kp)-aux1)) ;
+		aux := aux*sqr(kp*(2*n-1)/2/n) ;
+		aux1 := 0 ;
+		Loop i 1 n ;
+			aux1 := aux1+1/i/(2*i-1) ;
+		EndLoop ;
+		n := n + 1 ;
+	EndWhile ;
+EndProcedure ;
+
+{Fold} {scm_field}
+
+Procedure scm_field nPieceR nPieceE nTotal rMax zMax ;
+ {nPieceR:     number of pieces of the rings;
+  coefR:       information about each piece of rings;
+  coefR(i,1):  number of rings;
+  coefR(i,2):  type, 1 for line, 2 for arc, 3 for lines with
+               Variable density of rings;
+  coefR(i,3):  blank;
+  coefR(i,4):  starting point in z If type is 1 or 3;
+               starting angle (degree) If type is 2;
+  coefR(i,5):  starting point in R If type is 1 or 3;
+               0 If type is 2;
+  coefR(i,6):  ending point in z If type is 1 or 3;
+               ending angle (degree) If type is 2;
+  coefR(i,7):  ending point in R If type is 1 or 3;
+               0 If type is 2;
+  coefR(i,8):  0 If type is 1;
+               R If type is 2 ( (R-r0)^2+(z-z0)^2=R^2 );
+               starting distance between rings If type is 3;
+  coefR(i,9):  0 If type is 1;
+               z0 If type is 2;
+               ending distance between rings If type is 3;
+  coefR(i,10): 0 If type is 1 or 3;
+               r0 If type is 2;
+
+  nPieceE:     number of pieces of the electrodes;
+  coefE:       information about each piece of elecrtrodes;
+  coefE(i,1):  number of points;
+  coefE(i,2):  type, 1 for line, 2 for arc;
+  coefE(i,3):  voltage;
+  coefE(i,4):  starting point in z If type is 1;
+               starting angle (degree) If type is 2;
+  coefE(i,5):  starting point in R If type is 1;
+               0 If type is 2;
+  coefE(i,6):  ending point in z If type is 1;
+               ending angle (degree) If type is 2;
+  coefE(i,7):  ending point in R If type is 1;
+               0 If type is 2;
+  coefE(i,8):  0 If type is 1;
+               R If type is 2 ( (R-r0)^2+(z-z0)^2=R^2 );
+  coefE(i,9):  0 If type is 1;
+               z0 If type is 2;
+  coefE(i,10): 0 If type is 1;
+               r0 If type is 2;}
+
+	Variable i 1; Variable j 1; Variable k 1; Variable l 1;
+	Variable iTmp 1; Variable ktmp 1; Variable ier 1;
+	Variable tmp 1; Variable rtmp 1; Variable integral 1;
+	Variable theta 1; Variable thetat 1;
+	Variable sumz 1; Variable sumr 1; Variable delta 1;
+	Variable it1 1; Variable kt1 1;
+	Variable rElec 1 nTotal; Variable zElec 1 nTotal;
+	Variable rTest 1 nTotal; Variable zTest 1 nTotal;
+	Variable vtest 1 nTotal; Variable vselect 1;
+	Variable zselect 1; Variable rselect 1;
+	Variable tau 1;
+	Variable voltage 2 nTotal;
+	Variable gMatrixI 1 nTotal nTotal;
+	Variable gMatrix 1 nTotal nTotal;
+	Variable nMax 1; Variable r2 1; Variable volt2 1;
+	Variable volt 1; Variable str 400;
+	Variable aux 5; Variable z2 1;
+	Variable coefR 2 nPieceR 10; Variable coefE 2 nPieceE 10;
+	
+	Loop i 1 nPieceR; 
+		Read 11 str; 
+		coefR(i, 1):=R(str,1,3);
+		coefR(i, 2):=R(str,4,5);
+		coefR(i, 3):=R(str,6,7);
+		coefR(i, 4):=R(str,8,30);
+		coefR(i, 5):=R(str,31,53);
+		coefR(i, 6):=R(str,54,76);
+		coefR(i, 7):=R(str,77,99);
+		coefR(i, 8):=R(str,100,122);
+		coefR(i, 9):=R(str,123,145);
+		coefR(i,10):=R(str,146,168);
+	EndLoop;
+	CloseF 11;
+	Loop i 1 nPieceE; 
+		Read 12 str; 
+		coefE(i, 1):=R(str,1,3);
+		coefE(i, 2):=R(str,4,5);
+		coefE(i, 3):=R(str,6,13);
+		coefE(i, 4):=R(str,14,36);
+		coefE(i, 5):=R(str,37,59);
+		coefE(i, 6):=R(str,60,82);
+		coefE(i, 7):=R(str,83,105);
+		coefE(i, 8):=R(str,106,128);
+		coefE(i, 9):=R(str,129,151);
+		coefE(i,10):=R(str,152,174);
+	EndLoop;
+	CloseF 12;
+	
+	iTmp := 0 ;
+	Loop i 1 nPieceE ;
+		If i>1 ;
+			iTmp := iTmp+coefE(i-1,1) ;
+		EndIf ;
+		Loop j 1 coefE(i,1) ;
+			it1 := iTmp+j ;
+			voltage(it1) := coefE(i,3) ;
+			If coefE(i,2)=1 ;
+				If abs(coefE(i,6)-coefE(i,4))<1e-7 ;
+					zElec(it1) := coefE(i,4) ;
+					zTest(it1) := coefE(i,4) ;
+				ElseIf TRUE ;
+					zElec(it1) := coefE(i,4)+(coefE(i,6)-coefE(i,4))*(j-1/2)/coefE(i,1); 
+					zTest(it1) := coefE(i,4)+(coefE(i,6)-coefE(i,4))*j/coefE(i,1);
+				EndIf ;
+				If abs(coefE(i,7)-coefE(i,5))<1e-7 ;
+					rElec(it1) := coefE(i,5) ;
+					rTest(it1) := coefE(i,5) ;
+				ElseIf TRUE ;
+					rElec(it1) := coefE(i,5)+(coefE(i,7)-coefE(i,5))*(j-1/2)/coefE(i,1) ; 
+					rTest(it1) := coefE(i,5)+(coefE(i,7)-coefE(i,5))*j/coefE(i,1) ; 
+				EndIf ;
+			ElseIf coefE(i,2)=2 ;
+				theta := coefE(i,4)+(coefE(i,6)-coefE(i,4))*(j-1/2)/coefE(i,1) ;
+				theta := theta*DEGRAD ;
+				thetat := coefE(i,4)+(coefE(i,6)-coefE(i,4))*j/coefE(i,1) ;
+				thetat := thetat*DEGRAD ;
+				zElec(it1) := coefE(i,9)+coefE(i,8)*cos(theta) ;
+				rElec(it1) := coefE(i,10)+coefE(i,8)*sin(theta) ;
+				zTest(it1) := coefE(i,9)+coefE(i,8)*cos(thetat) ;
+				rTest(it1) := coefE(i,10)+coefE(i,8)*sin(thetat) ;
+			EndIf ;
+		EndLoop ;
+	EndLoop ;
+
+	iTmp := 0 ;
+	Loop i 1 nPieceR ;
+		If i>1 ;
+			iTmp := iTmp+coefR(i-1,1) ;
+		EndIf ;
+		sumz := 0 ; sumr := 0 ;
+		Loop j 1 coefR(i,1) ;
+			it1 := iTmp+j ;
+			If coefR(i,2)=1 ;
+				If abs(coefR(i,6)-coefR(i,4))<1e-7 ;
+					zRing(it1) := coefR(i,4) ;
+				ElseIf TRUE ;
+					zRing(it1) := coefR(i,4)+(coefR(i,6)-coefR(i,4))*(j-1/2)/coefR(i,1) ;
+				EndIf ;
+				If abs(coefR(i,7)-coefR(i,5))<1e-7 ;
+					rRing(it1) := coefR(i,5) ;
+				ElseIf TRUE ;
+					rRing(it1) := coefR(i,5)+(coefR(i,7)-coefR(i,5))*(j-1/2)/coefR(i,1) ;
+				EndIf ;
+			ElseIf coefR(i,2)=2 ;
+				theta := coefR(i,4)+(coefR(i,6)-coefR(i,4))*(j-1/2)/coefR(i,1) ;
+				theta := theta*DEGRAD ;
+				zRing(it1) := coefR(i,9)+coefR(i,8)*cos(theta) ;
+				rRing(it1) := coefR(i,10)+coefR(i,8)*sin(theta) ;
+			ElseIf coefR(i,2)=3 ;
+				delta := coefR(i,8)+(coefR(i,9)-coefR(i,8))*(j-1/2)/coefR(i,1) ;
+				Write 6 'delta := '&s(delta) ;
+				If abs(coefR(i,6)-coefR(i,4))<1e-7 ;
+					zRing(it1) := coefR(i,4) ;
+				ElseIf TRUE ;
+					aux := sqr(coefR(i,6)-coefR(i,4))+sqr(coefR(i,7)-coefR(i,5)) ;
+					aux := (coefR(i,6)-coefR(i,4))/sqrt(aux) ;
+					zRing(it1) := coefR(i,4)+sumz+delta*aux/2 ;
+					sumz := sumz+delta*aux ;
+				EndIf ;
+				If abs(coefR(i,7)-coefR(i,5))<1e-7 ;
+					rRing(it1) := coefR(i,5) ;
+				ElseIf TRUE ;
+					aux := sqr(coefR(i,6)-coefR(i,4))+sqr(coefR(i,7)-coefR(i,5)) ;
+					aux := (coefR(i,7)-coefR(i,5))/sqrt(aux) ;
+					rRing(it1) := coefR(i,5)+sumr+delta*aux/2 ;
+					sumr := sumr+delta*aux ;
+				EndIf ;
+			EndIf ;
+		EndLoop ;
+	EndLoop ;
+
+	OpenF 11 'zrRing.txt' 'UNKNOWN';
+	OpenF 12 'zrTest.txt' 'UNKNOWN';
+	OpenF 13 'zrElec.txt' 'UNKNOWN';
+	OpenF 14 'voltage.txt' 'UNKNOWN';
+	Loop i 1 nTotal ;
+		zRing(i):=zRing(i)*mmToM;
+		rRing(i):=rRing(i)*mmToM;
+		Write 11 SF(zRing(i),'(E24.16E2)')&'   '&SF(rRing(i),'(E24.16E2)');
+		zTest(i):=zTest(i)*mmToM;
+		rTest(i):=rTest(i)*mmToM;
+		Write 12 SF(zTest(i),'(E24.16E2)')&'   '&SF(rTest(i),'(E24.16E2)');
+		zElec(i):=zElec(i)*mmToM;
+		rElec(i):=rElec(i)*mmToM;
+		Write 13 SF(zElec(i),'(E24.16E2)')&'   '&SF(rElec(i),'(E24.16E2)');
+		Write 14 SF(i,'(I5)')&'   '&SF(cons(voltage(i)),'(E24.16E2)');
+	EndLoop ;
+	CloseF 11;
+	CloseF 12;
+	CloseF 13;
+	CloseF 14;
+	
+	Loop i 1 nTotal ;
+		Loop j 1 nTotal ;
+			rtmp := sqr(zElec(i)-zRing(j))+sqr(rElec(i)+rRing(j)) ;
+			tau := sqrt(4*rElec(i)*rRing(j)/rtmp) ;
+			If cons(tau)<0.8 ;
+				elliptic tau integral ;
+			ElseIf TRUE ;
+				ellipticp tau integral ;
+			EndIf ;
+			gMatrix(i,j) := integral/sqrt(rtmp) ;
+		EndLoop ;
+	EndLoop ;
+
+	{LInv gMatrix gMatrixI nTotal nTotal ier ;}
+	
+	{EV 02-Dec-2020: Replace the built-in matrix inversion by invokation of
+	an external matrix inversion program matinv.exe.}
+	OpenF 11 'matrix.txt' 'UNKNOWN' ;
+	Write 6 'Writing gMatrix to matrix.txt...' ;
+	Write 11 sf(ntotal,'(I5)') ;
+	str := '(E24.16)' ;
+	Loop i 1 ntotal ;
+		Loop j 1 ntotal ;
+			write 11 sf(gMatrix(i,j),str) ;
+		EndLoop ;
+	EndLoop ;
+	closef 11 ;
+	write 6 'Using external program matinv.exe to invert the matrix...' ;
+	write 6 'matinv.exe matrix.txt invmatrix.txt' ;
+	OS 'matinv.exe matrix.txt invmatrix.txt' ;
+	write 6 'Reading the inverted matrix gmatrixi from invmatrix.txt...' ;
+	openf 11 'invmatrix.txt' 'OLD' ;
+	read 11 ier ;
+	read 11 str ; {ntotal}
+	Loop i 1 nTotal ;
+		Loop j 1 nTotal ;
+			Read 11 tmp;
+			gMatrixI(i,j):=tmp;
+		EndLoop ;
+	EndLoop ;
+	closef 11 ;
+	
+	{Write 6 'ier := '&s(ier) ;}
+
+	str := '(E24.16)' ;
+	
+	OpenF 11 'gMatrixI.txt' 'UNKNOWN';
+	OpenFB 12 'gMatrixI.bin' 'UNKNOWN';
+	Loop i 1 nTotal ;
+		charge(i) := 0 ;
+		Loop j 1 nTotal ;
+			charge(i) := charge(i)+gMatrixI(i,j)*voltage(j) ;
+
+			Write 11 SF(i,'(I3)')&'     '&SF(j,'(I3)')&'     '&SF(gMatrixI(i,j),str) ;
+			temp:=gMatrixI(i,j);
+			WriteB 12 temp;
+		EndLoop ;
+	EndLoop ;
+	CloseF 11; CloseF 12;
+
+	OpenF 11 'test-volt.txt' 'UNKNOWN';
+	Loop i 1 nTotal ;
+		vtest(i) := 0 ;
+		Loop j 1 nTotal ;
+			rtmp := sqr(zElec(i)-zRing(j))+sqr(rElec(i)+rRing(j)) ;
+			tau := sqrt(4*rElec(i)*rRing(j)/rtmp) ;
+			If cons(tau)<0.8 ;
+				elliptic tau integral ;
+			ElseIf TRUE ;
+				ellipticp tau integral ;
+			EndIf ;
+			vtest(i) := vtest(i)+cons(charge(j))*integral/sqrt(rtmp) ;
+		EndLoop ;
+		Write 11 SF(i,'(I5)')&'    '&s((vtest(i)-cons(voltage(i)))) ;
+	EndLoop ;
+	CloseF 11;
+
+	OpenF 11 'test-volt_Alt.txt' 'UNKNOWN';
+	Loop i 1 nTotal ;
+		If (rTest(i)<rMax)*(zTest(i)<zMax) ;
+			vtest(i) := 0 ;
+			Loop j 1 nTotal ;
+				rtmp := sqr(zTest(i)-zRing(j))+sqr(rTest(i)+rRing(j)) ;
+				tau := sqrt(4*rTest(i)*rRing(j)/rtmp) ;
+				If cons(tau)<0.8 ;
+					elliptic tau integral ;
+				ElseIf TRUE ;
+					ellipticp tau integral ;
+				EndIf ;
+				vtest(i) := vtest(i)+cons(charge(j))*integral/sqrt(rtmp) ;
+			EndLoop ;
+			Write 11 SF(i,'(I5)')&'    '&s(vtest(i)-cons(voltage(i))) ;		
+		EndIf ;
+	EndLoop ;
+	CloseF 11;
+	
+	OpenF 11 'zrvolt.txt' 'UNKNOWN';
+	nMax := 400 ;
+	Loop i 0 nMax ;
+		z2 := (10+i/20)*mmToM ;
+		r2 := 0 ;
+		volt := 0 ;
+		Loop j 1 nTotal ;
+			rtmp := sqr(z2-zRing(j))+sqr(r2+rRing(j)) ;
+			tau := sqrt(4*r2*rRing(j)/rtmp) ;
+			If cons(tau)<0.8 ;
+				elliptic tau integral ;
+			ElseIf TRUE ;
+				ellipticp tau integral ;
+			EndIf ;
+			volt := volt+charge(j)*integral/sqrt(rtmp) ;
+		EndLoop ;
+		Write 11 SF(i,'(I5)')&'  '&s(z2)&'  '&s(r2)&'  '&s(volt) ;
+	EndLoop ;
+	CloseF 11;
+
+EndProcedure ;
+
+{Dolf}
+
+OV 1 3 0;
+RPE 1;
+UM;
+		  
+mmToM := 1e-3;{millimeters to meters}
+rMax := 25*mmToM; zMax := 1000*mmToM;
+
+Write 6 'Reading coefR and coefE.';
+
+OpenF 11 'coefR.txt' 'OLD';
+Read 11 nPieceR;
+Read 11 nTotal;
+
+OpenF 12 'coefE.txt' 'OLD';
+Read 12 nPieceE;
+
+
+Write 6 'Executing scm_field.';
+scm_field nPieceR nPieceE nTotal rMax zMax;
+Write 6 'Done';
+
+EndProcedure; Run; End;

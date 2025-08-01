@@ -1,0 +1,41 @@
+include 'COSY';
+
+Procedure Run;
+
+OBJECTIVE_FUNCTIONS;
+
+Init;
+ReadFiles;
+
+baseline:=0;
+
+V00:=0;
+V01:=0;
+V02:=0;
+V03:=0;
+
+V10:=0;
+V11:=0;
+V12:=0;
+V13:=0;
+
+V21:=0;
+V22:=0;
+V23:=0;
+
+V31:=0;
+V32:=0;
+V33:=0;
+
+BEAMREDEFINITIONS;
+
+SetVoltages voltages;
+obj:=0;
+
+OBJECTIVE;
+
+OpenF 11 'OBJECTIVE.txt' 'UNKNOWN';
+Write 11 S(obj);
+CloseF 11;
+
+EndProcedure; Run; End;

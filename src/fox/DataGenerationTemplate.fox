@@ -1,0 +1,37 @@
+include 'COSY';
+
+Procedure Run;
+
+Init;
+ReadFiles;
+
+baseline:=0;
+
+V00:=0;
+V01:=0;
+V02:=0;
+V03:=0;
+
+V10:=0;
+V11:=0;
+V12:=0;
+V13:=0;
+
+V21:=0;
+V22:=0;
+V23:=0;
+
+V31:=0;
+V32:=0;
+V33:=0;
+
+SetVoltages voltages;
+
+OpenF 11 'OUTPUT.txt' 'UNKNOWN';
+	GenerateMap voltages sampleZ aper0Z;
+	Write 11 S(MA(1,1))&','&S(MA(1,2))&','&S(MA(1,111))&','&S(MA(1,112))&','&S(MA(1,122))&','&S(MA(1,222));
+	GenerateMap voltages sampleZ detZ;
+	Write 11 S(MA(1,1))&','&S(MA(1,2))&','&S(MA(1,111))&','&S(MA(1,112))&','&S(MA(1,122))&','&S(MA(1,222));
+CloseF 11;
+
+EndProcedure; Run; End;

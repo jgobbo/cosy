@@ -1,0 +1,112 @@
+include 'COSY';
+
+Procedure Run;
+Variable i 1; Variable rTemp 1; Variable nSteps 1; Variable sampleD 1; 
+
+Procedure elliptic k integral;
+	Variable delta 1; Variable n 1; Variable aux 100; Variable diff 1;
+	
+	delta := 1e-25;
+	n := 1;
+	integral := 0;
+	aux := 1;
+	diff := 1;
+	While abs(diff)>delta;
+		integral := integral + aux;
+		diff := cons(pi*aux/2);
+		aux := aux*sqr(k*(2*n-1)/2/n);
+		n := n + 1;
+	EndWhile;
+	integral := integral*pi/2;
+EndProcedure;
+
+Procedure ellipticp k integral;
+	Variable iii 1; Variable delta 1; Variable n 1;
+	Variable diff 1; Variable aux 100; Variable aux1 100;
+	Variable kp 100;
+	
+	kp := sqrt(1-sqr(k));
+	delta := 1e-25;
+	n := 1;
+	integral := 0;
+	aux := 1;
+	aux1 := 0;
+	diff := 1;
+	While abs(diff)>delta;
+		integral := integral + aux*(log(4/kp)-aux1);
+		diff := cons(aux*(log(4/kp)-aux1));
+		aux := aux*sqr(kp*(2*n-1)/2/n);
+		aux1 := 0;
+		Loop iii 1 n;
+			aux1 := aux1+1/iii/(2*iii-1);
+		EndLoop;
+		n := n + 1;
+	EndWhile;
+EndProcedure;
+
+Function scm_field z r;
+	Variable ii 1; Variable tau 100; Variable rtmp 100; Variable integral 100;
+	
+	scm_field:=0;
+	Loop ii 1 nTotal;
+		rtmp := sqr(z-zring(ii))+sqr(r+rring(ii));
+		If abs(cons(r))<1e-10;
+			tau := 0;
+		ElseIf TRUE;
+			tau := sqrt(4*r*rring(ii)/rtmp);
+		EndIf;
+		If cons(tau)<0.8;
+			elliptic tau integral;
+		ElseIf TRUE;
+			ellipticp tau integral;
+		EndIf;
+		scm_field := scm_field+charge(ii)*integral/sqrt(rtmp);
+	EndLoop;
+EndFunction;
+
+Init;
+ReadFiles;
+
+intAng:=36*DEGRAD;
+spotSize:=100*um2mm;
+{sampleZ:= 5 - sampleDist;
+detZ:=786.54;}
+RedefineBeam;
+
+baseline:=10;
+
+V00:=599.991;
+V01:=158.156;
+V02:=599.968;
+
+V11:=189.113;
+V12:=397.567;
+V13:=0;
+
+V21:=598.228;
+V22:=459.532;
+V23:=0;
+
+V31:=169.163;
+V32:=188.384;
+V33:=0;
+
+VD0:=V23;
+VD1:=V23;
+VD2:=V23;
+
+SetVoltages voltages;
+
+ApplyTable voltages;
+
+OpenF 11 'sampleVoltage.txt' 'UNKNOWN'; Write 6 'Checking sample potential...';
+nSteps:=10000; sampleD:=25;
+Loop i 0 nSteps;
+	rTemp:=sampleD*i/(2*nSteps);
+	Write 11 SF(rTemp, '(F9.3)')&'   '&S(scm_field(sampleZ, rTemp)*kv2v);
+EndLoop;
+CloseF 11;
+
+RayTracing sampleZ detZ;
+ 
+EndProcedure; Run; End;

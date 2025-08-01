@@ -1,0 +1,27 @@
+include 'COSY';
+
+Procedure Run;
+Variable startingV 1; Variable endingV 1; Variable tempV 1;
+Variable nIters 1; Variable centroidAvg 1;
+
+Init;
+ReadFiles;
+
+VoltageOffset:=1;
+
+startingV:=1;
+endingV:=20;
+
+nIters:=0; centroidAvg:=0;
+Loop tempV startingV endingV 0.5;
+	nIters:=nIters+1;
+	V10:=tempV;
+	WeakLens 80 190;
+	centroidAvg:=centroidAvg + centroid;
+	Write 6 'V:='&S(V10)&'	centroid:='&S(centroid);
+EndLoop;
+centroidAvg:=centroidAvg / nIters;
+
+Write 6 centroidAvg;
+
+EndProcedure; Run; End;
