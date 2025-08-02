@@ -186,7 +186,7 @@ class SpeemOptimizer:
         )
         try:
             subprocess.call(
-                ["cosy", str(curr_function_file)],
+                ["cosy", curr_function_file.name],
                 stdout=open(os.devnull, "wb"),
                 timeout=900,
             )
@@ -271,7 +271,7 @@ class SpeemOptimizer:
                 template_lines=self.raw_template_lines,
                 filepath=filepath,
             )
-            subprocess.call(["cosy", str(filepath)], stdout=open(os.devnull, "wb"))
+            subprocess.call(["cosy", filepath.name], stdout=open(os.devnull, "wb"))
             os.remove(filepath)
             with open(aberrations_file, "rt") as f:
                 aberrations[objective.endpoint] = self._format_aberrations(f)
@@ -511,7 +511,7 @@ class SpeemOptimizer:
 
         print(f"raytracing with {lens_table}")
         filepath = self._prep_raytracing_file(lens_table, start=start, end=end)
-        subprocess.call(["cosy", str(filepath)])
+        subprocess.call(["cosy", filepath.name])
         os.remove(filepath)
 
         if self.messenger is not None:

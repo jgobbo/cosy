@@ -14,8 +14,10 @@ wheels/
 **/cosy.fox
 *.bin
 *.lis
+**/RKLOG.DAT
 
 # Proprietary
 results/
 **/lens_scripts
 *.txt
+*.json
