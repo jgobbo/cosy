@@ -70,6 +70,7 @@ name = "cosy"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "colorama" },
     { name = "matplotlib" },
     { name = "numpy" },
     { name = "pathos" },
@@ -80,6 +81,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "colorama", specifier = ">=0.4.6" },
     { name = "matplotlib", specifier = ">=3.10.3" },
     { name = "numpy", specifier = ">=2.3.2" },
     { name = "pathos", specifier = ">=0.3.4" },
