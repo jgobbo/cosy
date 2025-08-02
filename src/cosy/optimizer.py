@@ -397,7 +397,6 @@ class SpeemOptimizer:
                 options={
                     "display": "off",
                     "uncertainty_handling": False,
-                    "random_seed": random.randint(0, 1e9),
                 },
             )
             result: "OptimizeResult" = bads.optimize()

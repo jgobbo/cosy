@@ -21,3 +21,7 @@ results/
 **/lens_scripts
 *.txt
 *.json
+
+# Slurm
+*.out
+
