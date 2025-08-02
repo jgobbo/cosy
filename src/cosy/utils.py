@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from .constants import ROOT_DIR
+from .constants import FOX_DIR
 
 __all__ = [
     "edit_lines",
@@ -81,10 +81,10 @@ def create_file_from_template(
 def process_file(process_id: int, file: Path) -> Path:
     """Append the `process_id` to the `file` and return the full `Path`."""
     split_name = file.name.split(".")
-    return ROOT_DIR / f"{split_name[0]}_{process_id}.{split_name[1]}"
+    return FOX_DIR / f"{split_name[0]}_{process_id}.{split_name[1]}"
 
 
-def lis_purge(folder: Path = ROOT_DIR) -> None:
+def lis_purge(folder: Path = FOX_DIR) -> None:
     """Delete all .lis files in the provided folder."""
     for file in os.listdir(folder):
         if file.endswith(".lis"):

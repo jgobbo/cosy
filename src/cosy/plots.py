@@ -3,16 +3,25 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 
-from .constants import *
+from .constants import (
+    FOX_DIR,
+    DET_D,
+    APER_0_D,
+    APER_1_D,
+    SAMPLE_Z,
+    DET_Z,
+    APER_0_Z,
+    APER_1_Z,
+)
 
-__all__ = ["ROOT_DIR", "conversion_map", "plot_rays", "plot_lens"]
 
-ROOT_DIR = Path(__file__).parent.parent.parent.absolute()
+__all__ = ["conversion_map", "plot_rays", "plot_lens"]
+
 M_TO_MM = 1000
 
 
 def conversion_map(
-    root: Path = ROOT_DIR,
+    root: Path = FOX_DIR,
     error_bars: bool = False,
     ax: plt.Axes = None,
 ) -> tuple[plt.Figure, plt.Axes]:
@@ -151,7 +160,7 @@ def conversion_map(
     return fig, ax
 
 
-def plot_rays(root: Path = ROOT_DIR, ax: plt.Axes = None):
+def plot_rays(root: Path = FOX_DIR, ax: plt.Axes = None):
     rays_path = root / "rays.txt"
     table_path = root / "lensTable.txt"
     lens_path = root / "zrElec.txt"
@@ -256,7 +265,7 @@ def _plot_rays(rays_path, table_path, lens_path, ax=None):
     return fig, ax
 
 
-def plot_lens(root: Path = ROOT_DIR, n_plots: int = 1):
+def plot_lens(root: Path = FOX_DIR, n_plots: int = 1):
     spacer = 0.001
 
     elec_path = root / "zrElec.txt"

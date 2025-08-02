@@ -17,7 +17,12 @@ from multiprocessing import (
 import numpy as np
 
 from cosy.utils import process_file, create_file_from_template, LensTable
-from cosy.constants import ROOT_DIR, Electrode, HARDWARE_RESTRICTED_LENS_LIMITS
+from cosy.constants import (
+    FOX_DIR,
+    RESULTS_DIR,
+    Electrode,
+    HARDWARE_RESTRICTED_LENS_LIMITS,
+)
 
 from typing import TYPE_CHECKING
 
@@ -26,9 +31,9 @@ if TYPE_CHECKING:
 
 LOCK = Lock()
 
-FUNCTION_FILE = ROOT_DIR / "DataGeneration.fox"
-OUTPUT_FILE = ROOT_DIR / "output.txt"
-RESULT_FOLDER = ROOT_DIR / "simulation_data" / "model_data"
+FUNCTION_FILE = FOX_DIR / "DataGeneration.fox"
+OUTPUT_FILE = FOX_DIR / "output.txt"
+RESULT_FOLDER = RESULTS_DIR / "simulation_data" / "model_data"
 
 
 class DataGenerator:
@@ -36,11 +41,11 @@ class DataGenerator:
     template_lines: list[str]
 
     def __init__(self, lens_limits=None):
-        os.chdir(ROOT_DIR)
+        os.chdir(FOX_DIR)
         self.lens_limits = (
             HARDWARE_RESTRICTED_LENS_LIMITS if lens_limits is None else lens_limits
         )
-        with open(ROOT_DIR / "DataGenerationTemplate.fox", "rt") as f:
+        with open(FOX_DIR / "DataGenerationTemplate.fox", "rt") as f:
             self.template_lines = f.readlines()
 
     def generate_datum_for_model(self, filename: str) -> None:

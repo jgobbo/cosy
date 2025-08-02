@@ -1,7 +1,8 @@
 from pathlib import Path
 from enum import StrEnum
 
-ROOT_DIR = Path(__file__).parent.parent.parent.absolute()
+FOX_DIR = Path(__file__).parent.parent.absolute() / "fox"
+RESULTS_DIR = Path(__file__).parent.parent.parent.absolute() / "results"
 
 
 class Electrode(StrEnum):

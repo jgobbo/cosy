@@ -9,7 +9,7 @@ from colorama import Fore, Style
 from multiprocessing import current_process
 from pathos.multiprocessing import ProcessingPool
 
-from .constants import HARDWARE_RESTRICTED_LENS_LIMITS, ROOT_DIR, Electrode
+from .constants import HARDWARE_RESTRICTED_LENS_LIMITS, FOX_DIR, RESULTS_DIR, Electrode
 from .utils import (
     lis_purge,
     edit_lines,
@@ -34,11 +34,11 @@ __all__ = [
     "LensTable",
 ]
 
-FUNCTION_FILE = ROOT_DIR / "Objective.fox"
-TEMPLATE_FILE = ROOT_DIR / "ObjectiveTemplate.fox"
-OBJECTIVE_FILE = ROOT_DIR / "objective.txt"
-RAYTRACING_FILE = ROOT_DIR / "RaytracingTemplate.fox"
-RECORD_FILE = ROOT_DIR / "optimization_record.json"
+FUNCTION_FILE = FOX_DIR / "Objective.fox"
+TEMPLATE_FILE = FOX_DIR / "ObjectiveTemplate.fox"
+OBJECTIVE_FILE = FOX_DIR / "objective.txt"
+RAYTRACING_FILE = FOX_DIR / "RaytracingTemplate.fox"
+RECORD_FILE = FOX_DIR / "optimization_record.json"
 
 
 class SpeemOptimizer:
@@ -59,7 +59,7 @@ class SpeemOptimizer:
         beam_parameters: list[str] = None,
         messenger: "SlackMessenger" = None,
     ) -> None:
-        os.chdir(ROOT_DIR)
+        os.chdir(FOX_DIR)
         self._default_lens_table = default_lens_table
         self._beam_parameters = beam_parameters
         self.lens_limits = (
@@ -260,7 +260,7 @@ class SpeemOptimizer:
             except OSError:
                 pass
 
-            filepath = ROOT_DIR / f"Aberrations_Temp_{objective.endpoint}.fox"
+            filepath = FOX_DIR / f"Aberrations_Temp_{objective.endpoint}.fox"
             print(f"Getting aberrations at {objective.endpoint}.")
             identifiers = common_identifiers + [f"OBJECTIVE;"]
             replacements = common_replacements + [
@@ -484,7 +484,7 @@ class SpeemOptimizer:
             )
 
     def generate_data_for_metric(self, n: int, filename: str) -> None:
-        result_folder = ROOT_DIR / "simulation_data"
+        result_folder = RESULTS_DIR / "simulation_data"
 
         self.record.append(self._objective_parameters())
         self.save_record(result_folder / f"{filename}_metric_metadata.json")
@@ -549,7 +549,7 @@ class SpeemOptimizer:
             + [conversion_map]
         )
 
-        destination_file = ROOT_DIR / "Raytracing_Temp.fox"
+        destination_file = FOX_DIR / "Raytracing_Temp.fox"
 
         create_file_from_template(
             list(zip(identifiers, replacements)),
