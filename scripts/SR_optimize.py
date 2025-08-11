@@ -12,7 +12,7 @@ def main():
     optimizer = SpeemOptimizer(
         beam_parameters=[
             "intAng:=5*DEGRAD",
-            "spotSize:=100*um2mm",
+            "spotSize:=50*um2mm",
             "aper0D:=0.125",
             "V02:=V00",
             "V10:=V00",
@@ -37,13 +37,14 @@ def main():
     optimizer.global_optimize()
 
     optimizer.save_record()
-    # optimizer.raytracing()
+    optimizer.raytracing()
 
     end = time.perf_counter()
     print(f"Optimization time taken - {timedelta(seconds=end - start)}")
 
 
 if __name__ == "__main__":
+    # main()
     try:
         main()
     except Exception as e:
