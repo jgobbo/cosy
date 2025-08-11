@@ -9,12 +9,15 @@ wheels/
 # Virtual environments
 .venv
 
-# Cosy Source
+# Cosy
 **/cosy.exe
 **/cosy.fox
+Makefile
+*.f
 *.bin
 *.lis
-**/RKLOG.DAT
+*.dat
+*.DAT
 
 # Proprietary
 results/

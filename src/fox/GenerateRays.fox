@@ -53,8 +53,11 @@ V33:=0;
 }
 
 SetVoltages voltages;
+
+GenerateMap voltages sampleZ detZ;
+PM 6;
 {
-RayTracing sampleZ detZ;}
+RayTracing sampleZ detZ;
 SRConversionMap;
- 
+} 
 EndProcedure; Run; End;

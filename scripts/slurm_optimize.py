@@ -35,7 +35,7 @@ def main():
         StandardObjectiveFunction.ANGLE_RESOLVED_APERTURE_0 * 10000,
         StandardObjectiveFunction.MINNED_SPATIAL_RESOLVED_DETECTOR,
     )
-    n_processors = int(os.getenv("SLURM_NTASKS_PER_NODE"))
+    n_processors = int(os.getenv("SLURM_NTASKS_PER_NODE")) * int(os.getenv("SLURM_NNODES"))
     optimizer.global_optimize(n_runs=n_processors, n_processors=n_processors)
 
     optimizer.save_record()

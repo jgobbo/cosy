@@ -1,10 +1,10 @@
 [project]
 name = "cosy"
 version = "0.1.0"
-description = "Add your description here"
+description = "run Cosy simulations through Python"
 readme = "README.md"
 authors = [
-    { name = "jgobbo", email = "gobbo.jacob@gmail.com" }
+    { name = "Jacob Gobbo", email = "gobbo.jacob@gmail.com" }
 ]
 requires-python = ">=3.13"
 dependencies = [
@@ -15,9 +15,6 @@ dependencies = [
     "pybads>=1.0.5",
     "sympy>=1.14.0",
 ]
-
-[project.scripts]
-cosy = "cosy:main"
 
 [build-system]
 requires = ["hatchling"]

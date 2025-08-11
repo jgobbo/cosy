@@ -1,4 +1,4 @@
-Include 'Cosy';
+Include 'COSY';
 
 Procedure Run;
 Variable mmToM 1;
@@ -258,8 +258,8 @@ Procedure scm_field nPieceR nPieceE nTotal rMax zMax ;
 		EndLoop ;
 	EndLoop ;
 
-	{LInv gMatrix gMatrixI nTotal nTotal ier ;}
-	
+	LINV gMatrix gMatrixI nTotal nTotal ier ;
+{
 	{EV 02-Dec-2020: Replace the built-in matrix inversion by invokation of
 	an external matrix inversion program matinv.exe.}
 	OpenF 11 'matrix.txt' 'UNKNOWN' ;
@@ -286,7 +286,7 @@ Procedure scm_field nPieceR nPieceE nTotal rMax zMax ;
 		EndLoop ;
 	EndLoop ;
 	closef 11 ;
-	
+}	
 	{Write 6 'ier := '&s(ier) ;}
 
 	str := '(E24.16)' ;
