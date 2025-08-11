@@ -1,4 +1,4 @@
-import os, time, subprocess, json, re, random
+import os, time, subprocess, json, re, random, shutil
 from dataclasses import asdict
 from typing import TextIO, TYPE_CHECKING
 from pathlib import Path
@@ -159,12 +159,12 @@ class SpeemOptimizer:
         if isinstance(table_values, list):
             table_values = np.array(table_values)
 
-        start = time.perf_counter()
+        #start = time.perf_counter()
 
         lens_table = LensTable(
             zip(list(self.lens_limits.keys()), table_values.flatten())
         )
-        print(f"{Fore.RED}{lens_table}{Style.RESET_ALL}")
+        #print(f"{Fore.RED}{lens_table}{Style.RESET_ALL}")
 
         if process_id is None:
             try:
@@ -198,11 +198,11 @@ class SpeemOptimizer:
         os.remove(curr_objective_file)
         os.remove(curr_function_file)
 
-        end = time.perf_counter()
-        print(
-            f"{Fore.GREEN}{process_id}obj: {obj:.2e} with {lens_table} in "
-            f"{str(timedelta(seconds=end-start))[2:7]}{Style.RESET_ALL}"
-        )
+        #end = time.perf_counter()
+        #print(
+        #    f"{Fore.GREEN}{process_id}obj: {obj:.2e} with {lens_table} in "
+        #    f"{str(timedelta(seconds=end-start))[2:7]}{Style.RESET_ALL}"
+        #)
         return obj
 
     def EGO_objective(self, table_values: np.ndarray):
@@ -388,6 +388,7 @@ class SpeemOptimizer:
             plausible_upper_bounds = plausible_bounds[:, 1]
 
         def worker(process_id: int | None = None):
+            print(f"starting worker {process_id}")
             bads = BADS(
                 fun=lambda x: self.objective(x, process_id),
                 lower_bounds=voltage_limits[:, 0],
@@ -397,6 +398,7 @@ class SpeemOptimizer:
                 options={
                     "display": "off",
                     "uncertainty_handling": False,
+                    "random_seed": random.randint(0, int(1e9)),
                 },
             )
             result: "OptimizeResult" = bads.optimize()
