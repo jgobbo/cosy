@@ -388,6 +388,7 @@ class SpeemOptimizer:
             plausible_upper_bounds = plausible_bounds[:, 1]
 
         def worker(process_id: int | None = None):
+            start = time.perf_counter()
             print(f"starting worker {process_id}")
             bads = BADS(
                 fun=lambda x: self.objective(x, process_id),
@@ -404,7 +405,10 @@ class SpeemOptimizer:
             result: "OptimizeResult" = bads.optimize()
             optimal_objective = result.fval
             optimal_lens_table = result.x
-            print(f"run {process_id} done with obj={optimal_objective}")
+            print(
+                    f"run {process_id} done with obj={optimal_objective} in "
+                    f"{str(timedelta(seconds=(time.perf_counter()-start)))}"
+                    )
             return optimal_objective, optimal_lens_table
 
         with ProcessingPool(processes=n_processes) as pool:

@@ -1,24 +1,21 @@
-import time, os
+import time, os, ssl, certifi
 from datetime import timedelta
 
 from cosy import *
-# from slappy import *
+from slappy import *
 
 
-def main():
+def main(messenger):
     start = time.perf_counter()
-    #messenger = SlackMessenger(default_channel=Users.Jacob)
-    messenger=None
 
     optimizer = SpeemOptimizer(
         beam_parameters=[
             "intAng:=5*DEGRAD",
-            "spotSize:=100*um2mm",
+            "spotSize:=50*um2mm",
             "aper0D:=0.125",
             "V02:=V00",
             "V10:=V00",
         ],
-        messenger=messenger,
     )
     optimizer.lens_limits = {
         Electrode.baseline: (-0.5, 10),
@@ -43,7 +40,15 @@ def main():
     end = time.perf_counter()
     print(f"Optimization time taken - {timedelta(seconds=end - start)}")
 
+    messenger.send_message("slurm optimization finished")
+
 
 if __name__ == "__main__":
-    main()
+    ssl_context = ssl.create_default_context(cafile=certifi.where())
+    messenger = SlackMessenger(default_channel=Users.Jacob, ssl=ssl_context)
+
+    try:
+        main(messenger)
+    except Exception as e:
+        messenger.send_message(f"slurm_optimization failed with {e}")
 
