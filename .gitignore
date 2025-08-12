@@ -18,6 +18,7 @@ Makefile
 *.lis
 *.dat
 *.DAT
+*_Temp.fox
 
 # Proprietary
 results/
