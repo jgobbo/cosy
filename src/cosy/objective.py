@@ -212,6 +212,9 @@ class StandardObjectiveFunction:
     MINNED_ANGLE_RESOLVED_APERTURE_0 = minned_angle_resolved_objective_function(
         "aper0Z", "aper0D"
     )
+    MINNED_ANGLE_RESOLVED_DETECTOR = minned_angle_resolved_objective_function(
+        "detZ", "detD"
+    )
     MINNED_SPATIAL_RESOLVED_DETECTOR = minned_spatial_resolved_objective_function(
         "detZ", "detD"
     )

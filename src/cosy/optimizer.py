@@ -159,12 +159,12 @@ class SpeemOptimizer:
         if isinstance(table_values, list):
             table_values = np.array(table_values)
 
-        #start = time.perf_counter()
+        # start = time.perf_counter()
 
         lens_table = LensTable(
             zip(list(self.lens_limits.keys()), table_values.flatten())
         )
-        #print(f"{Fore.RED}{lens_table}{Style.RESET_ALL}")
+        # print(f"{Fore.RED}{lens_table}{Style.RESET_ALL}")
 
         if process_id is None:
             try:
@@ -198,11 +198,11 @@ class SpeemOptimizer:
         os.remove(curr_objective_file)
         os.remove(curr_function_file)
 
-        #end = time.perf_counter()
-        #print(
+        # end = time.perf_counter()
+        # print(
         #    f"{Fore.GREEN}{process_id}obj: {obj:.2e} with {lens_table} in "
         #    f"{str(timedelta(seconds=end-start))[2:7]}{Style.RESET_ALL}"
-        #)
+        # )
         return obj
 
     def EGO_objective(self, table_values: np.ndarray):
@@ -406,9 +406,9 @@ class SpeemOptimizer:
             optimal_objective = result.fval
             optimal_lens_table = result.x
             print(
-                    f"run {process_id} done with obj={optimal_objective} in "
-                    f"{str(timedelta(seconds=(time.perf_counter()-start)))}"
-                    )
+                f"run {process_id} done with obj={optimal_objective} in "
+                f"{str(timedelta(seconds=(time.perf_counter()-start)))}"
+            )
             return optimal_objective, optimal_lens_table
 
         with ProcessingPool(processes=n_processes) as pool:
@@ -420,8 +420,6 @@ class SpeemOptimizer:
         optimal_lens_tables = list(optimal_lens_tables)
         print("optimal_objectives:")
         print(optimal_objectives)
-        print("optimal_lens_tables:")
-        print(optimal_lens_tables)
 
         min_index = optimal_objectives.index(min(optimal_objectives))
 

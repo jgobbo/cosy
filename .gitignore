@@ -19,6 +19,7 @@ Makefile
 *.dat
 *.DAT
 *_Temp.fox
+Objective_*
 
 # Proprietary
 results/
