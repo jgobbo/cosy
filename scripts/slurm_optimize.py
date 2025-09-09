@@ -10,15 +10,15 @@ def main(messenger):
 
     optimizer = SpeemOptimizer(
         beam_parameters=[
-            "intAng:=5*DEGRAD",
-            "spotSize:=50*um2mm",
-            "aper0D:=0.125",
+            "intAng:=20*DEGRAD",
+            "spotSize:=1*um2mm",
+            "aper0D:=0.5",
             "V02:=V00",
             "V10:=V00",
         ],
     )
     optimizer.lens_limits = {
-        Electrode.baseline: (-0.5, 10),
+        Electrode.baseline: (3, 6),
         Electrode.V00: (0, 6000),
         Electrode.V01: (-100, 550),
         Electrode.V03: (-300, 550),
@@ -28,19 +28,23 @@ def main(messenger):
         Electrode.V21: (0, 50),
         Electrode.V32: (0, 50),
     }
-    optimizer.objectives = (
-        StandardObjectiveFunction.ANGLE_RESOLVED_APERTURE_0 * 10000,
-        StandardObjectiveFunction.MINNED_SPATIAL_RESOLVED_DETECTOR,
-    )
-    n_processors = int(os.getenv("SLURM_NTASKS_PER_NODE")) * int(os.getenv("SLURM_NNODES"))
+    #optimizer.objectives = (
+    #    StandardObjectiveFunction.ANGLE_FILTER_APERTURE_0 * 10000,
+    #    StandardObjectiveFunction.MINNED_SPATIAL_RESOLVED_DETECTOR,
+    #)
+    optimizer.objectives = (StandardObjectiveFunction.SPATIAL_FILTER_APERTURE_0 * 1000,
+            StandardObjectiveFunction.MINNED_ANGLE_RESOLVED_DETECTOR)
+
+    n_processors = int(os.getenv("SLURM_NTASKS_PER_NODE")) * int(os.getenv("SLURM_NNODES")) * 2
     optimizer.global_optimize(n_runs=n_processors, n_processors=n_processors)
 
-    optimizer.save_record()
+    job_id = int(os.getenv("SLURM_JOB_ID"))
+    optimizer.save_record(job_id)
 
     end = time.perf_counter()
     print(f"Optimization time taken - {timedelta(seconds=end - start)}")
 
-    messenger.send_message("slurm optimization finished")
+    messenger.send_message(f"slurm optimization finished - {job_id}")
 
 
 if __name__ == "__main__":
