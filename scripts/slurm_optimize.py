@@ -5,7 +5,7 @@ from cosy import *
 from slappy import *
 
 
-def main(messenger):
+def main(messenger: SlackMessenger):
     start = time.perf_counter()
 
     optimizer = SpeemOptimizer(
@@ -28,14 +28,18 @@ def main(messenger):
         Electrode.V21: (0, 50),
         Electrode.V32: (0, 50),
     }
-    #optimizer.objectives = (
+    # optimizer.objectives = (
     #    StandardObjectiveFunction.ANGLE_FILTER_APERTURE_0 * 10000,
     #    StandardObjectiveFunction.MINNED_SPATIAL_RESOLVED_DETECTOR,
-    #)
-    optimizer.objectives = (StandardObjectiveFunction.SPATIAL_FILTER_APERTURE_0 * 1000,
-            StandardObjectiveFunction.MINNED_ANGLE_RESOLVED_DETECTOR)
+    # )
+    optimizer.objectives = (
+        StandardObjectiveFunction.SPATIAL_FILTER_APERTURE_0 * 1000,
+        StandardObjectiveFunction.MINNED_ANGLE_RESOLVED_DETECTOR,
+    )
 
-    n_processors = int(os.getenv("SLURM_NTASKS_PER_NODE")) * int(os.getenv("SLURM_NNODES")) * 2
+    n_processors = (
+        int(os.getenv("SLURM_NTASKS_PER_NODE")) * int(os.getenv("SLURM_NNODES")) * 2
+    )
     optimizer.global_optimize(n_runs=n_processors, n_processors=n_processors)
 
     job_id = int(os.getenv("SLURM_JOB_ID"))
@@ -49,10 +53,9 @@ def main(messenger):
 
 if __name__ == "__main__":
     ssl_context = ssl.create_default_context(cafile=certifi.where())
-    messenger = SlackMessenger(default_channel=Users.Jacob, ssl=ssl_context)
+    messenger = SlackMessenger(default_user=Users.Jacob, ssl=ssl_context)
 
     try:
         main(messenger)
     except Exception as e:
         messenger.send_message(f"slurm_optimization failed with {e}")
-

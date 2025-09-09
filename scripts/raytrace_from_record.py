@@ -6,7 +6,7 @@ from slappy import SlackMessenger, Users
 
 
 def main() -> None:
-    messenger = SlackMessenger(default_channel=Users.Jacob)
+    messenger = SlackMessenger(default_user=Users.Jacob)
 
     with open(FOX_DIR / "optimization_record.json") as f:
         optimization_record = json.load(f)[-1]

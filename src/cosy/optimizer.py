@@ -71,8 +71,8 @@ class SpeemOptimizer:
         self.objectives = objectives
 
         self.messenger = messenger
-        if messenger is not None and messenger.default_channel is None:
-            print("Messenger doesn't have a default channel. No messages will be sent.")
+        if messenger is not None and messenger.default_user is None:
+            print("Messenger doesn't have a default user. No messages will be sent.")
             self.messenger = None
 
     def _update_template(
@@ -317,7 +317,7 @@ class SpeemOptimizer:
             optimization_record["all_optimal_objectives"] = all_optimal_objectives
         self.record.append(optimization_record)
 
-    def save_record(self, id:int=None) -> None:
+    def save_record(self, id: int = None) -> None:
         output = json.dumps(self.record, indent=4)
 
         # making lowest level lists into single lines
@@ -345,7 +345,11 @@ class SpeemOptimizer:
                 output_list[i] = re.sub(r"[ \t]+", "", output_list[i])
         output = "".join(output_list)
 
-        filepath = self.record_file if id is None else RESULTS_DIR / f"optimization_record_{id}.json"
+        filepath = (
+            self.record_file
+            if id is None
+            else RESULTS_DIR / f"optimization_record_{id}.json"
+        )
         if not filepath.parent.exists():
             filepath.parent.mkdir()
         with open(filepath, "w") as f:

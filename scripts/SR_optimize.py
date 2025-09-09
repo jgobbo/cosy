@@ -7,7 +7,7 @@ from slappy import *
 
 def main():
     start = time.perf_counter()
-    messenger = SlackMessenger(default_channel=Users.Jacob)
+    messenger = SlackMessenger(default_user=Users.Jacob)
 
     optimizer = SpeemOptimizer(
         beam_parameters=[
@@ -48,6 +48,6 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        error_messenger = SlackMessenger(default_channel=Users.Jacob)
+        error_messenger = SlackMessenger(default_user=Users.Jacob)
         error_messenger.send_message(f"Optimization failed with error: {e}")
         raise

@@ -3,7 +3,7 @@ from slappy import SlackMessenger, Users
 
 
 def main() -> None:
-    messenger = SlackMessenger(default_channel=Users.Jacob)
+    messenger = SlackMessenger(default_user=Users.Jacob)
 
     beam_parameters = [
         "intAng:=15*DEGRAD",
