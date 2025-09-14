@@ -8,35 +8,34 @@ from slappy import *
 def main(messenger: SlackMessenger):
     start = time.perf_counter()
 
-    mode="spatial"
-    if mode=="angle":
+    mode = "angle"
+    if mode == "angle":
         beam_parameters = [
-            "intAng:=15*DEGRAD",
-            "spotSize:=1*um2mm",
-            "aper0D:=0.1",
+            "intAng:=80*DEGRAD",
+            "spotSize:=100*um2mm",
+            "aper0D:=2",
             "V02:=V00",
             "V10:=V00",
         ]
         lens_limits = {
+            Electrode.baseline: (5, 12),
             Electrode.V00: (0, 6000),
             Electrode.V01: (-100, 600),
             Electrode.V03: (-300, 600),
             Electrode.V11: (0, 550),
             Electrode.V12: (0, 550),
             Electrode.V13: (0, 550),
-            Electrode.V21: (0, 300),
-            Electrode.V22: (0, 300),
-            Electrode.V23: (0, 300),
-            Electrode.V31: (0, 300),
-            Electrode.V32: (0, 300),
-            Electrode.V33: (0, 300),
+            Electrode.V21: (0, 50),
+            Electrode.V22: (0, 50),
+            Electrode.V31: (0, 50),
+            Electrode.V32: (0, 50),
         }
         objectives = (
-            StandardObjectiveFunction.SPATIAL_FILTER_APERTURE_0 * 1000,
-            StandardObjectiveFunction.MINNED_ANGLE_RESOLVED_DETECTOR,
+            StandardObjectiveFunction.SPATIAL_FILTER_APERTURE_0 * 10,
+            StandardObjectiveFunction.MAXED_ANGLE_RESOLVED_DETECTOR,
         )
-    elif mode=="spatial":
-        beam_parameters=[
+    elif mode == "spatial":
+        beam_parameters = [
             "intAng:=5*DEGRAD",
             "spotSize:=50*um2mm",
             "aper0D:=0.05",
@@ -53,21 +52,20 @@ def main(messenger: SlackMessenger):
             Electrode.V32: (0, 50),
         }
         objectives = (
-           StandardObjectiveFunction.ANGLE_FILTER_APERTURE_0 * 10000,
-           StandardObjectiveFunction.MINNED_SPATIAL_RESOLVED_DETECTOR,
+            StandardObjectiveFunction.ANGLE_FILTER_APERTURE_0 * 10000,
+            StandardObjectiveFunction.MINNED_SPATIAL_RESOLVED_DETECTOR,
         )
-        
 
     job_id = int(os.getenv("SLURM_JOB_ID"))
-    n_processors = (
-        int(os.getenv("SLURM_NTASKS_PER_NODE")) * int(os.getenv("SLURM_NNODES"))
+    n_processors = int(os.getenv("SLURM_NTASKS_PER_NODE")) * int(
+        os.getenv("SLURM_NNODES")
     )
     print(f"{n_processors=}")
 
     optimizer = SpeemOptimizer(
-            beam_parameters=beam_parameters,
-            lens_limits=lens_limits,
-            objectives=objectives,
+        beam_parameters=beam_parameters,
+        lens_limits=lens_limits,
+        objectives=objectives,
     )
 
     messenger.send_message(f"starting slurm optimization - {job_id} {mode}")
