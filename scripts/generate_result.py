@@ -12,7 +12,7 @@ from cosy import FOX_DIR
 def main() -> None:
     argv = sys.argv
     job_id = None
-    if len(argv > 1):
+    if len(argv) > 1:
         job_id = int(argv[1])
     else:
         messenger = SlackMessenger(default_user=Users.Jacob)

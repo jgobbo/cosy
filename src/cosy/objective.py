@@ -220,6 +220,36 @@ def spatial_filter_objective_function(
     )
 
 
+def clear_aperture_objective_function(
+    endpoint: str, aper_d: str | int | float, function_name: str = "ClearApertureObj"
+):
+    return ObjectiveFunction(
+        f"{function_name}(none)",
+        endpoint,
+        create_function(
+            function_name,
+            ["Variable iter 1; Variable startingR 1; Variable ii 1; Variable nAngs 1"]
+            + ["Variable ri 12 6; Variable ro 12 6"]
+            + [f"nAngs:=10; startingR:=0; {function_name}:=0"]
+            + ["Loop iter 1 2"]
+            + ["Loop ii 1 10"]
+            + ["ri(1):=startingR"]
+            + ["ri(2):=Sin(ii/nAngs*intAng/2)"]
+            + ["ri(3):=0"]
+            + ["ri(4):=0"]
+            + ["ri(5):=0"]
+            + ["ri(6):=0"]
+            + ["Polval 1 MAP 6 ri 6 ro 6"]
+            + [f"If ABS(ro(1))>({aper_d}/2)"]
+            + [add_to_function(function_name, f"(ABS(ro(1))-{aper_d}/2)")]
+            + ["EndIf"]
+            + ["EndLoop"]
+            + ["startingR:=spotSize/2"]
+            + ["EndLoop"],
+        ),
+    )
+
+
 @dataclass
 class StandardObjectiveFunction:
     """
@@ -249,3 +279,4 @@ class StandardObjectiveFunction:
     MINNED_SPATIAL_RESOLVED_APERTURE_0 = minned_spatial_resolved_objective_function(
         "aper0Z", "aper0D"
     )
+    CLEAR_APERTURE_0 = clear_aperture_objective_function("aper0Z", "aper0D")

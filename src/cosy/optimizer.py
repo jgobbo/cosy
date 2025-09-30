@@ -168,7 +168,7 @@ class SpeemOptimizer:
 
         # this should prevent race conditions regardless of the number of processes
         if process_id is None:
-            process_id= random.randrange(0, int(1e4))
+            process_id = random.randrange(0, int(1e4))
         curr_objective_file = process_file(process_id, self.objective_file)
         curr_function_file = process_file(process_id, self.function_file)
         for _ in range(3):
@@ -210,10 +210,10 @@ class SpeemOptimizer:
             pass
 
         end = time.perf_counter()
-        #print(
+        # print(
         #  f"{Fore.GREEN}{process_id} obj: {obj:.2e} with {lens_table} in "
         #  f"{str(timedelta(seconds=end-start))[2:7]}{Style.RESET_ALL}"
-        #)
+        # )
         return obj
 
     def EGO_objective(self, table_values: np.ndarray):
@@ -243,7 +243,7 @@ class SpeemOptimizer:
         )
 
     def _get_aberrations(self, lens_table: LensTable) -> list[str]:
-        process_id = random.randrange(0,int(1e4))
+        process_id = random.randrange(0, int(1e4))
         aberrations_file = f"aberrations_{process_id}.txt"
         common_identifiers = [f"{lens_name}:=" for lens_name in lens_table.keys()] + [
             "OBJECTIVE_FUNCTIONS;",
@@ -272,7 +272,9 @@ class SpeemOptimizer:
             except OSError:
                 pass
 
-            filepath = FOX_DIR / f"Aberrations_Temp_{objective.endpoint}_{process_id}.fox"
+            filepath = (
+                FOX_DIR / f"Aberrations_Temp_{objective.endpoint}_{process_id}.fox"
+            )
             print(f"Getting aberrations at {objective.endpoint}.")
             identifiers = common_identifiers + [f"OBJECTIVE;"]
             replacements = common_replacements + [
@@ -409,7 +411,7 @@ class SpeemOptimizer:
             start = time.perf_counter()
             print(f"starting worker {process_id}")
             bads = BADS(
-                    fun=lambda x: self.objective(x),
+                fun=lambda x: self.objective(x),
                 lower_bounds=voltage_limits[:, 0],
                 upper_bounds=voltage_limits[:, 1],
                 plausible_lower_bounds=plausible_lower_bounds,

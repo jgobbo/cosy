@@ -13,18 +13,18 @@ def main():
     messenger = SlackMessenger(default_user=Users.Jacob)
     optimizer = SpeemOptimizer(
         beam_parameters=[
-            "intAng:=15*DEGRAD",
-            "spotSize:=1*um2mm",
-            "aper0D:=100*um2mm",
+            "intAng:=30*DEGRAD",
+            "spotSize:=100*um2mm",
+            "aper0D:=2",
+            "V02:=V00",
+            "V03:=V00",
+            "V10:=V00",
         ],
         messenger=messenger,
     )
     optimizer.lens_limits = {
         Electrode.V00: (0, 600),
         Electrode.V01: (-100, 600),
-        Electrode.V02: (0, 600),
-        Electrode.V03: (-300, 600),
-        Electrode.V10: (0, 600),
         Electrode.V11: (0, 550),
         Electrode.V12: (0, 550),
         Electrode.V13: (0, 550),
@@ -37,10 +37,10 @@ def main():
     }
 
     optimizer.objectives = (
-        StandardObjectiveFunction.SPATIAL_FILTER_APERTURE_0 * 1000,
+        StandardObjectiveFunction.CLEAR_APERTURE_0 * 10,
         StandardObjectiveFunction.MINNED_ANGLE_RESOLVED_DETECTOR,
     )
-    optimizer.global_optimize()
+    optimizer.global_optimize(n_processes=7)
 
     optimizer.save_record()
     optimizer.raytracing()
