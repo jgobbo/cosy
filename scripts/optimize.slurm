@@ -6,7 +6,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=56
 #SBATCH --cpus-per-task=1
-#SBATCH --time=48:00:00
+#SBATCH --time=72:00:00
 
 OUTPUT_DIR=~/outputs
 mkdir -p "$OUTPUT_DIR"

@@ -3,7 +3,7 @@
 #SBATCH --account=pc_eoopt
 #SBATCH --partition=lr4
 #SBATCH --qos=lr_debug
-#SBATCH --nodes=1
+#SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=00:30:00

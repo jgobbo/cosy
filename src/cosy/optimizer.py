@@ -159,20 +159,25 @@ class SpeemOptimizer:
         if isinstance(table_values, list):
             table_values = np.array(table_values)
 
-        # start = time.perf_counter()
+        start = time.perf_counter()
 
         lens_table = LensTable(
             zip(list(self.lens_limits.keys()), table_values.flatten())
         )
         # print(f"{Fore.RED}{lens_table}{Style.RESET_ALL}")
 
+        # this should prevent race conditions regardless of the number of processes
         if process_id is None:
-            try:
-                (process_id,) = current_process()._identity
-            except ValueError:
-                process_id = 0
+            process_id= random.randrange(0, int(1e4))
         curr_objective_file = process_file(process_id, self.objective_file)
         curr_function_file = process_file(process_id, self.function_file)
+        for _ in range(3):
+            if curr_objective_file.exists() or curr_function_file.exists():
+                process_id = random.randrange(0, int(1e4))
+                curr_objective_file = process_file(process_id, self.objective_file)
+                curr_function_file = process_file(process_id, self.function_file)
+            else:
+                break
 
         # prepping objective output file in case cosy crashes and outputs nothing
         with open(curr_objective_file, "wt") as f:
@@ -195,14 +200,20 @@ class SpeemOptimizer:
         with open(curr_objective_file, "rt") as f:
             obj = float(f.readline())
 
-        os.remove(curr_objective_file)
-        os.remove(curr_function_file)
+        try:
+            os.remove(curr_objective_file)
+        except FileNotFoundError:
+            pass
+        try:
+            os.remove(curr_function_file)
+        except FileNotFoundError:
+            pass
 
-        # end = time.perf_counter()
-        # print(
-        #    f"{Fore.GREEN}{process_id}obj: {obj:.2e} with {lens_table} in "
-        #    f"{str(timedelta(seconds=end-start))[2:7]}{Style.RESET_ALL}"
-        # )
+        end = time.perf_counter()
+        #print(
+        #  f"{Fore.GREEN}{process_id} obj: {obj:.2e} with {lens_table} in "
+        #  f"{str(timedelta(seconds=end-start))[2:7]}{Style.RESET_ALL}"
+        #)
         return obj
 
     def EGO_objective(self, table_values: np.ndarray):
@@ -232,7 +243,8 @@ class SpeemOptimizer:
         )
 
     def _get_aberrations(self, lens_table: LensTable) -> list[str]:
-        aberrations_file = "aberrations.txt"
+        process_id = random.randrange(0,int(1e4))
+        aberrations_file = f"aberrations_{process_id}.txt"
         common_identifiers = [f"{lens_name}:=" for lens_name in lens_table.keys()] + [
             "OBJECTIVE_FUNCTIONS;",
             "BEAMREDEFINITIONS",
@@ -260,7 +272,7 @@ class SpeemOptimizer:
             except OSError:
                 pass
 
-            filepath = FOX_DIR / f"Aberrations_Temp_{objective.endpoint}.fox"
+            filepath = FOX_DIR / f"Aberrations_Temp_{objective.endpoint}_{process_id}.fox"
             print(f"Getting aberrations at {objective.endpoint}.")
             identifiers = common_identifiers + [f"OBJECTIVE;"]
             replacements = common_replacements + [
@@ -397,7 +409,7 @@ class SpeemOptimizer:
             start = time.perf_counter()
             print(f"starting worker {process_id}")
             bads = BADS(
-                fun=lambda x: self.objective(x, process_id),
+                    fun=lambda x: self.objective(x),
                 lower_bounds=voltage_limits[:, 0],
                 upper_bounds=voltage_limits[:, 1],
                 plausible_lower_bounds=plausible_lower_bounds,
