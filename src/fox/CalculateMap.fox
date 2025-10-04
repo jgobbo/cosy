@@ -1,0 +1,40 @@
+include 'COSY';
+
+Procedure Run;
+
+Init;
+ReadFiles;
+V00:=582.9929;
+V01:=281.5174;
+V02:=7.161326;
+V03:=474.82193;
+V10:=255.62827;
+V11:=256.18958;
+V12:=534.81384;
+V13:=33.32258;
+V21:=283.9036;
+V22:=0.007158362;
+V23:=335.4544;
+V31:=185.85085;
+V32:=134.39069;
+V33:=110.299736;
+
+SetVoltages voltages;
+PrintLensTable;
+
+GenerateMap voltages sampleZ aper0Z;
+Write 6 S(MA(1,1))&'    '&S(MA(1,2))&'  '&S(MA(1,111))&'    '&S(MA(1,112))&'    '&S(MA(1,122))&'    '&S(MA(1,222));
+GenerateMap voltages sampleZ detZ;
+Write 6 S(MA(1,1))&'    '&S(MA(1,2))&'  '&S(MA(1,111))&'    '&S(MA(1,112))&'    '&S(MA(1,122))&'    '&S(MA(1,222));
+
+intAng:=5*DEGRAD;
+RedefineBeam;
+obj:=0;
+GenerateMap voltages sampleZ aper0Z;
+obj:=obj+MA(1,1)^2+MA(1,111)^2+MA(1,112)^2+MA(1,122)^2+MA(1,222)^2+(ABS(MA(1,2))-0.25)^2;
+obj:=obj*1000;
+GenerateMap voltages sampleZ detZ;
+obj:=obj+MA(1,2)^2+MA(1,111)^2+MA(1,112)^2+MA(1,122)^2+MA(1,222)^2+(ABS(MA(1,1))-12.5)^2;
+Write 6 'obj:='&S(obj);
+
+EndProcedure; Run; End;

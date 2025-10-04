@@ -64,6 +64,16 @@ def free_angle_resolved_function(
     ]
 
 
+def free_angle_resolved_objective_function(
+    endpoint: str, function_name: str = "FreeAngleResolvedObj"
+):
+    return ObjectiveFunction(
+        f"{function_name}(none)",
+        endpoint,
+        create_function(function_name, free_angle_resolved_function(function_name)),
+    )
+
+
 def free_spatial_resolved_function(
     function_name: str,
 ) -> list[str]:
@@ -228,24 +238,26 @@ def clear_aperture_objective_function(
         endpoint,
         create_function(
             function_name,
-            ["Variable iter 1; Variable startingR 1; Variable ii 1; Variable nAngs 1"]
-            + ["Variable ri 12 6; Variable ro 12 6"]
-            + [f"nAngs:=10; startingR:=0; {function_name}:=0"]
-            + ["Loop iter 1 2"]
-            + ["Loop ii 1 10"]
-            + ["ri(1):=startingR"]
-            + ["ri(2):=Sin(ii/nAngs*intAng/2)"]
-            + ["ri(3):=0"]
-            + ["ri(4):=0"]
-            + ["ri(5):=0"]
-            + ["ri(6):=0"]
-            + ["Polval 1 MAP 6 ri 6 ro 6"]
-            + [f"If ABS(ro(1))>({aper_d}/2)"]
-            + [add_to_function(function_name, f"(ABS(ro(1))-{aper_d}/2)")]
-            + ["EndIf"]
-            + ["EndLoop"]
-            + ["startingR:=spotSize/2"]
-            + ["EndLoop"],
+            [
+                "Variable iter 1; Variable startingR 1; Variable ii 1; Variable nAngs 1",
+                "Variable ri 12 6; Variable ro 12 6",
+                f"nAngs:=10; startingR:=0; {function_name}:=0",
+                "Loop iter 1 2",
+                "Loop ii 1 10",
+                "ri(1):=startingR",
+                "ri(2):=Sin(ii/nAngs*intAng/2)",
+                "ri(3):=0",
+                "ri(4):=0",
+                "ri(5):=0",
+                "ri(6):=0",
+                "Polval 1 MAP 6 ri 6 ro 6",
+                f"If ABS(ro(1))>({aper_d}/2)",
+                add_to_function(function_name, f"(ABS(ro(1))-{aper_d}/2)"),
+                "EndIf",
+                "EndLoop",
+                "startingR:=spotSize/2",
+                "EndLoop",
+            ],
         ),
     )
 
@@ -256,6 +268,7 @@ class StandardObjectiveFunction:
     Standard objectives for SPEEM optimization
     """
 
+    FREE_ANGLE_RESOLVED_DETECTOR = free_angle_resolved_objective_function("detZ")
     ANGLE_RESOLVED_DETECTOR = angle_resolved_objective_function("detZ", "detD")
     SPATIAL_RESOLVED_DETECTOR = spatial_resolved_objective_function("detZ", "detD")
     MINNED_ANGLE_RESOLVED_APERTURE_0 = minned_angle_resolved_objective_function(
@@ -275,6 +288,7 @@ class StandardObjectiveFunction:
     )
     ANGLE_FILTER_APERTURE_0 = angle_filter_objective_function("aper0Z", "aper0D")
     SPATIAL_FILTER_APERTURE_0 = spatial_filter_objective_function("aper0Z", "aper0D")
+    FREE_ANGLE_RESOLVED_APERTURE_0 = free_angle_resolved_objective_function("aper0Z")
     ANGLE_RESOLVED_APERTURE_0 = angle_resolved_objective_function("aper0Z", "aper0D")
     MINNED_SPATIAL_RESOLVED_APERTURE_0 = minned_spatial_resolved_objective_function(
         "aper0Z", "aper0D"
